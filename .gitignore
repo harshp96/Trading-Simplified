@@ -4,3 +4,4 @@ pmClient/__pycache__/
 tests/__pycache__/
 *.DS_Store
 API_Keys.json
+debug.log
