@@ -4,6 +4,11 @@ import matplotlib.pyplot as plt
 from utils import PMService
 from time import sleep
 
+import datetime
+
+def epoch_to_time(epoch_timestamp):
+    return datetime.datetime.fromtimestamp(epoch_timestamp)
+
 pmObj = PMService()
 pm = pmObj.getPmClient()
 
@@ -91,7 +96,7 @@ date_rng = []
 prices = []
 while True:
     data = pm.get_live_market_data('LTP', ['NSE', '82880', 'OPTION'])['data'][0]
-    date_rng.append(data['last_trade_time'])
+    date_rng.append(epoch_to_time(data['last_trade_time']))
     prices.append(data['last_price'])
 
     print('date : {}, price : {}'.format(date_rng[-1], prices[-1]))
