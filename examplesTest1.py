@@ -1,6 +1,11 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from utils import PMService
+from time import sleep
+
+pmObj = PMService()
+pm = pmObj.getPmClient()
 
 class OptionTradingStrategy:
     def __init__(self, rsi_period=14, bb_window=20, bb_num_std=2, rsi_buy_threshold=30, rsi_sell_threshold=70):
@@ -74,17 +79,25 @@ end_date = '2023-01-05'
 interval = '15T' # 15T 1H
 max_price_change = 0.01
 
-prices = generate_live_data(start_date, end_date, interval, max_price_change)
-date_rng = pd.date_range(start='2023-01-01', end='2023-01-05', freq=interval)
+# prices = generate_live_data(start_date, end_date, interval, max_price_change)
+# date_rng = pd.date_range(start='2023-01-01', end='2023-01-05', freq=interval)
 
 # Initialize the option trading strategy
 strategy = OptionTradingStrategy()
 
 # Apply the option trading strategy to the sample data
 signals = []
-for price in prices.values:
-    signal = strategy.add_new_data_point(price)
+date_rng = []
+prices = []
+while True:
+    data = pm.get_live_market_data('LTP', ['NSE', '82880', 'OPTION'])['data'][0]
+    date_rng.append(data['last_trade_time'])
+    prices.append(data['last_price'])
+
+    print('date : {}, price : {}'.format(date_rng[-1], prices[-1]))
+    signal = strategy.add_new_data_point(prices[-1])
     signals.append(signal)
+    sleep(5)
 
 # Convert the signals to a DataFrame with the same index as the price data
 signals_df = pd.DataFrame({'Signal': signals}, index=prices.index)
